@@ -1,7 +1,9 @@
-<!-- pendiente: borra esta línea cuando empieces a escribir la página -->
 # 1 · La remesa nueva
 
-> ✏️ Qué llegó: la entrega del parte con fecha de carga 2026-05-16. ¿Qué venía mal? Di qué columna, desde cuándo y cuántas filas.
-> ✏️ Cómo lo descubriste: qué test se puso rojo y qué decía. Si ninguno lo hizo, ¿qué te hizo sospechar?
-> ✏️ Cómo lo arreglaste en plata, y por qué ahí y no en bronce.
-> ✏️ Cierra con una cifra automática, por ejemplo: «plata tiene ahora {{ stg_parte.filas }} servicios, sin perder ninguna».
+**Qué llegó.** La entrega del parte con fecha de carga **2026-05-16**: 136 servicios nuevos (SRV-00552 a SRV-00687, sin solapar los 551 anteriores), realizados entre el 06/05 y el 15/05 de 2026. El problema no estaba en una fila, sino en **toda la columna `fecha`**: como el parte lo rellenan personas en otro equipo, la remesa entera venía con la fecha en formato **DD/MM/YYYY** (ej. `06/05/2026`) en lugar del ISO `YYYY-MM-DD` de las entregas anteriores.
+
+**Cómo lo descubrí.** Esta vez ningún test se puso rojo: el modelo **ni siquiera se construyó**. `dbt build` abortó en la primera línea que tipa la fecha con un `Conversion Error: invalid date field format: "06/05/2026", expected format is (YYYY-MM-DD)` — falló la construcción, no un test. Siguiendo la pista del encargo, pregunté directamente a bronce (tal como lo lee dbt, en formato texto), agrupando por entrega: las 561 filas de `fecha_carga=2026-05-06` eran 100 % ISO y las 136 de `fecha_carga=2026-05-16` eran 100 % `DD/MM/YYYY`. ¿Quizá era MM/DD? No: **39 filas de la remesa tienen día > 12** (p. ej. `15/05/2026`), cosa imposible si el primer número fuera el mes — con eso la interpretación día-primero queda probada sin ambigüedad. También comprobé que el resto de la remesa estaba limpio: sin duplicados (los servicios nuevos arrancan en SRV-00552 exactamente donde acababan los anteriores) y con `operario` ya normalizado por el `upper(trim())` que ya vivía en plata.
+
+**Cómo lo arreglé.** En **plata** (`stg_parte.sql`), que es donde viven todos los arreglos: bronce es el registro de lo que recibió y no se toca nunca. Antes de tipar, la consulta detecta el formato por el separador: si la fecha casca con el patrón `DD/MM/AAAA` la interpreta como día-primero; si no, como ISO. Así la plata es consistente pase lo que pase en la siguiente entrega, y el criterio queda documentado en el propio SQL con un comentario. Los 8 nodos de `dbt build` volvieron a verde sin bajar ningún test.
+
+**El lakehouse, en cifras:** la plata tiene ahora **{{ stg_parte.filas }}** servicios (687 de 698 filas crudas en dos entregas: los 10 duplicados de la entrega de abril siguen deduplicándose), cada uno único por `servicio`, con fechas desde el 06/04 hasta el 15/05 de 2026.
