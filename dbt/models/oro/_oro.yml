@@ -1,0 +1,52 @@
+version: 2
+models:
+  - name: dim_operario
+    description: "Una fila por cada operario del parte: la cara de la dimensión personas."
+    columns:
+      - name: operario
+        data_tests:
+          - unique
+          - not_null
+  - name: dim_furgoneta
+    description: "Una fila por cada furgoneta del parte (matrícula)."
+    columns:
+      - name: furgoneta
+        data_tests:
+          - unique
+          - not_null
+  - name: dim_tipo_lavado
+    description: "Una fila por cada tipo de lavado del parte."
+    columns:
+      - name: tipo_lavado
+        data_tests:
+          - unique
+          - not_null
+  - name: fact_servicios
+    description: "El hecho: una fila por servicio, con las medidas del negocio y las claves hacia las dimensiones."
+    columns:
+      - name: servicio
+        data_tests: [unique, not_null]
+      - name: operario
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_operario')
+                field: operario
+      - name: furgoneta
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_furgoneta')
+                field: furgoneta
+      - name: tipo_lavado
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tipo_lavado')
+                field: tipo_lavado
+  - name: pregunta_1
+    description: "Ingreso por hora de cada tipo de lavado, de menor a mayor. La primera fila responde la pregunta 1."
+  - name: pregunta_2
+    description: "Litros de agua por hora de cada operario, de mayor a menor. La primera fila responde la pregunta 2."
+  - name: pregunta_3
+    description: "Incidencias por cada 100 horas de servicio de cada furgoneta, de mayor a menor. La primera fila responde la pregunta 3."
