@@ -1,7 +1,9 @@
-<!-- pendiente: borra esta línea cuando empieces a escribir la página -->
 # 3 · Fuentes nuevas
 
-> ✏️ Qué llegó: la fuente nueva y el registro de eventos ({{ stg_eventos.filas }} eventos en plata). Para qué sirve cada uno.
-> ✏️ El giro de tu registro: qué tenía de especial y cómo lo has tratado en plata.
-> ✏️ Tu test protagonista: la regla de negocio en una frase, cuántas filas devolvía en rojo y qué cambiaste para el verde.
-> ✏️ Pregunta 4: tu respuesta con su cifra, citada con marcas de `pregunta_4`. ¿Qué habría salido sin tener en cuenta el giro?
+**Qué llegó.** Dos ficheros al bronce: `furgonetas.csv` (la capacidad del depósito de cada furgoneta, 8 filas de referencia) y el **registro de los contadores**: {{ stg_eventos.filas }} eventos en plata — de cada furgoneta, una `lectura` del contador cada 10 minutos y un `fin_servicio` al acabar cada lavado. El contador marca el agua acumulada usada desde el último llenado; el registro cubre el día 18/05, con 125 servicios.
+
+**El giro del registro.** Una misma furgoneta ocupa centenares de filas, y el contador es **acumulativo**: el gasto no es el valor sino la **diferencia con la lectura anterior**… hasta que se rellena el depósito y el contador **vuelve a cero**. El primer modelo lo ignoró: 19 tramos con «consumo» negativo, algo que en un tramo real es absurdo. El arreglo interpreta la caída como recarga: el gasto de ese tramo es lo que faltaba hasta el depósito lleno más lo consumido después. Añadir también que el registro tiene huecos: de 36 de los 428 tramos faltan lecturas intermedias (saltos de 20+ minutos) — hay que leerlo mirando la secuencia, no la tabla.
+
+**Tu test protagonista.** La regla de negocio en una frase: **un consumo de agua nunca es negativo**. Como test singular en `dbt/tests/consumos_no_negativos.sql` (devuelve las filas que la incumplen), escrito antes de arreglar los datos: en rojo devolvía **19 tramos** en las 8 furgonetas — caídas de tipo −116,1 L entre dos lecturas de 10 minutos. Tras tratar la recarga en `stg_consumos`, el test está verde con las mismas reglas de negocio.
+
+**Pregunta 4** · ¿Qué furgoneta **gasta más agua por servicio**, medida por el contador? La responde {{ pregunta_4.furgoneta[0] }}: {{ pregunta_4.l_por_servicio_contador[0] }} litros por servicio el día del registro — y ahí está la historia: en el parte, esa misma furgoneta aparece con {{ pregunta_4.l_por_servicio_parte[0] }} l/servicio, **la más baja de toda la flota**. Las dos medidas no cuadran: o el contador del día 18 (u operarios con preferencia por esa furgoneta) miente, o las declaraciones del parte subestiman sistemáticamente el gasto de furgoneta. El resto del ranking sí se parece (3522SWM, segunda por contador, primera por parte). Sin tener en cuenta el giro de la recarga, los consumos negativos habrían hundido el total de 404,4 L de 8707GBG y la respuesta habría salido torcida o directamente imposible de interpretar.
