@@ -314,13 +314,11 @@ def enlace(nombre, titulo, actual):
 
 
 def menu(actual):
-    historia_escrita = not leer_pagina("historia")[1]
-    pasos_escrita = not leer_pagina("historia-pasos")[1]
-    enlaces = [enlace("index", "Inicio · la historia" if historia_escrita else "Inicio", actual)]
-    if historia_escrita:
+    historia_lista = not leer_pagina("historia")[1]
+    enlaces = [enlace("index", "Inicio · la historia" if historia_lista else "Inicio", actual)]
+    if not historia_lista:
         enlaces.append(enlace("historia", "La historia", actual))
-    if pasos_escrita:
-        enlaces.append(enlace("historia-pasos", "Cómo se construyó la historia", actual))
+    enlaces.append(enlace("historia-pasos", "Cómo se construyó la historia", actual))
     dentro = actual in dict(LAKEHOUSE)
     grupo = "".join(enlace(n, t, actual) for n, t in LAKEHOUSE)
     activa = ' class="activa"' if dentro else ""
@@ -382,7 +380,9 @@ def inicio():
 <h1>{e(CASO['empresa'])}</h1><p>{md_a_html(CASO['contexto'])[3:-4]}</p></section>
 <section><h2>Las cuatro preguntas de la dirección</h2><div class="rejilla">{''.join(tarjetas)}</div>
 <p class="nota">Cada respuesta es la primera fila de su modelo de oro, leída del lakehouse al generar esta web.</p></section>
-<section><h2>Bitácora del equipo de datos</h2>{lista_estados(BITACORA)}</section>"""
+<section><h2>Bitácora del equipo de datos</h2>{lista_estados(BITACORA)}</section>
+<section><h2>Jornada 7 · La historia</h2>{lista_estados(HISTORIA)}
+<p class="nota">Cuando escribas <code>paginas/historia.md</code>, tu historia pasará a ser la portada de este portal.</p></section>"""
 
 
 def montaje():
@@ -457,7 +457,7 @@ def generar():
     SITE.mkdir()
     shutil.copy(RAIZ / "web" / "estilo.css", SITE / "estilo.css")
     piezas = [("index", "Inicio", inicio()), ("montaje", "Cómo está montado", montaje())]
-    piezas += [(n, t, bitacora(n, t)) for n, t in BITACORA + HISTORIA if not leer_pagina(n)[1]]
+    piezas += [(n, t, bitacora(n, t)) for n, t in BITACORA + HISTORIA]
     piezas.append(("datos", "Datos abiertos", datos()))
     for nombre, titulo, cuerpo in piezas:
         (SITE / f"{nombre}.html").write_text(pagina(nombre, titulo, cuerpo), encoding="utf-8")
