@@ -50,3 +50,5 @@ models:
     description: "Litros de agua por hora de cada operario, de mayor a menor. La primera fila responde la pregunta 2."
   - name: pregunta_3
     description: "Incidencias por cada 100 horas de servicio de cada furgoneta, de mayor a menor. La primera fila responde la pregunta 3."
+  - name: pregunta_4
+    description: "Agua por servicio de cada furgoneta según el contador, junto a lo que dice el parte. La primera fila responde la pregunta 4."

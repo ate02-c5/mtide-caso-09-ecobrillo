@@ -13,3 +13,23 @@ models:
           - accepted_values:
               arguments:
                 values: ["exterior express", "completo", "interior", "tapicería", "detailing premium", "moto", "SUV", "flota de empresa"]
+  - name: stg_eventos
+    description: "El registro de los contadores: una fila por evento (lectura o fin de servicio)."
+    columns:
+      - name: evento_id
+        data_tests: [unique, not_null]
+      - name: tipo
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["lectura", "fin_servicio"]
+  - name: stg_furgonetas
+    description: "Capacidad del depósito de cada furgoneta, por la fuente de referencia."
+    columns:
+      - name: furgoneta
+        data_tests: [unique, not_null]
+  - name: stg_consumos
+    description: "El consumo entre lecturas consecutivas, con el giro de la recarga ya tratado."
+    columns:
+      - name: consumo_l
+        data_tests: [not_null]
