@@ -52,3 +52,40 @@ models:
     description: "Incidencias por cada 100 horas de servicio de cada furgoneta, de mayor a menor. La primera fila responde la pregunta 3."
   - name: pregunta_4
     description: "Agua por servicio de cada furgoneta según el contador, junto a lo que dice el parte. La primera fila responde la pregunta 4."
+  - name: historia_puente
+    description: "Puente parte-contador: litros por servicio que declara el parte frente a lo que mide el contador (día del registro, recargas corregidas), el hueco en % y el mismo contraste sin corregir."
+    columns:
+      - name: furgoneta
+        data_tests:
+          - unique
+          - not_null
+      - name: l_por_servicio_parte
+        data_tests: [not_null]
+      - name: l_por_servicio_contador
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [26.96, 21.74, 20.10, 19.31, 18.19, 18.08, 17.69, 16.89]
+      - name: hueco_pct
+        data_tests: [not_null]
+  - name: historia_calor
+    description: "Incidencias por 100 h por furgoneta y tipo de lavado: el mapa de calor que descarta que el exceso de 8707GBG venga del tipo de servicio."
+    columns:
+      - name: furgoneta
+        data_tests: [not_null]
+      - name: tipo_lavado
+        data_tests: [not_null]
+      - name: inc_100h
+        data_tests: [not_null]
+  - name: historia_diaria
+    description: "El terreno día a día del partel: servicios, ingresos, agua total y litros por servicio por fecha."
+    columns:
+      - name: fecha
+        data_tests:
+          - unique
+          - not_null
+      - name: servicios
+        data_tests: [not_null]
+      - name: l_por_servicio
+        data_tests: [not_null]
