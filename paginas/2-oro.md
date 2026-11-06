@@ -1,8 +1,11 @@
-<!-- pendiente: borra esta línea cuando empieces a escribir la página -->
 # 2 · El oro
 
-> ✏️ Tu estrella: qué es una fila de `fact_servicios` ({{ fact_servicios.filas }} filas) y qué dimensiones la rodean.
-> ✏️ Pregunta 1 · ¿Qué **tipo de lavado** deja menos ingreso por hora? Tu respuesta, con marcas: {{ pregunta_1.tipo_lavado[0] }} con {{ pregunta_1.ingreso_hora[0] }} €/hora.
-> ✏️ Pregunta 2 · ¿Qué **operario** gasta más agua por hora? Con {{ pregunta_2.operario[0] }} y {{ pregunta_2.l_agua_hora[0] }}.
-> ✏️ Pregunta 3 · ¿Qué **furgoneta** acumula más incidencias por cada 100 horas de servicio? Con {{ pregunta_3.furgoneta[0] }} y {{ pregunta_3.incidencias_100h[0] }}.
-> ✏️ Con la remesa nueva, ¿se mantienen las respuestas de la J3? ¿Por qué crees que sí o que no?
+Nuestro esquema en estrella gira alrededor de un hecho con grano claro: **una fila de `fact_servicios` es un servicio** ({{ fact_servicios.filas }} filas, una por número de servicio, todas únicas —así lo vigilan sus tests—). Alrededor van **tres dimensiones**, una por cada forma de cortar los datos que pide la dirección: `dim_operario` (9 operarios), `dim_furgoneta` (8 matrículas) y `dim_tipo_lavado` (8 tipos). Las medidas del negocio —`minutos`, `litros_agua`, `importe_eur`— se suman sobre el hecho; `con_incidencia` pasa a booleana para poder contarla. Cada clave de la tabla de hechos se comprueba con un test `relationships` contra su dimensión: no puede existir un servicio con un operario que no esté en `dim_operario`.
+
+**Pregunta 1** · ¿Qué **tipo de lavado** deja menos ingreso por hora? Tu respuesta, con marcas: {{ pregunta_1.tipo_lavado[0] }} con {{ pregunta_1.ingreso_hora[0] }} €/hora. Es el doble de barato que el segundo por abajo (`tapicería`): lavar flota corporativa está cobrando por debajo del coste que debería sostener el negocio. La otra punta confirma el patrón: `moto` es lo más rentable ({{ pregunta_1.ingreso_hora[7] }} €/h).
+
+**Pregunta 2** · ¿Qué **operario** gasta más agua por hora? Con {{ pregunta_2.operario[0] }} y {{ pregunta_2.l_agua_hora[0] }}. No es marginal: el resto del equipo ronda 15–17 l/h, así que el hueco es grande y sostenido en el tiempo, no un servicio raro.
+
+**Pregunta 3** · ¿Qué **furgoneta** acumula más incidencias por cada 100 horas de servicio? Con {{ pregunta_3.furgoneta[0] }} y {{ pregunta_3.incidencias_100h[0] }}. La siguiente a su derecha (7456PHZ) va por 7,30: la matrícula señalada está en otro orden de magnitud.
+
+**¿Se mantienen las respuestas de la J3?** Sí, las tres, y eso es lo importante: la remesa nueva añade un 25 % más de datos y las respuestas no se mueven (flota de empresa, Alba Sánchez y 8707GBG ya salían en el cuaderno de la J3). Las cifras apenas cambian —el ingreso/hora de la flota sube de 34,08 a 34,22, el consumo/hora de Alba baja de 20,46 a 20,43— porque las novedades se reparten de forma parecida a lo que ya teníamos. Cuando una señal sobrevive a más datos sin desplomarse, deja de parecer ruido y está para decidirse: los tres hallazgos son señales robustas, no casualidades de un mes.
